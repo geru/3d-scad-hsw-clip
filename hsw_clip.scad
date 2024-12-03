@@ -1,6 +1,6 @@
 include <BOSL2/std.scad>
 include <BOSL2/rounding.scad>
-include <hkern0_scad/BOSL2_utils.scad>
+include <BOSL2_utils.scad>
 include <hswx.scad>
 
 $fn=50;
