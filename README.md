@@ -12,3 +12,8 @@ Parameters within source allow generation of:
 * hsw_clip_with_hex_base: the clip with an HSW-compatible hexagonal base
 * hsw_clip_with_rect_base: the clip with an HSW-compatible rectangular base
 * hsw_clipconnector: a simple little connector to hold two neighboring pieces of HSW together
+
+Copyright (c) 2024 [Hugh Kern](https://hkern0.com)
+[@geru](https://github.com/geru)
+
+See LICENSE.txt for licensing.
