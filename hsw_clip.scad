@@ -10,13 +10,14 @@ generate_clip_rect_base = false;
 generate_clip_hex_base = false;
 
 // A double clip to hold two pieces of HSW together
-module hsw_clipconnector() {
+module hsw_clipconnector( slop=0 // some extra gap so the fit is not so tight
+) {
   height=3;
   difference() {
     union() { // two clips with base
-      hsw_clip(center=true, rotate=180, type=0, rectbase=3);
+      hsw_clip(center=true, rotate=180, type=0, rectbase=3, slop=slop);
       translate([HSWX_OUTSIDE,0,0])
-        hsw_clip(center=true, rotate=0, type=0, rectbase=height);
+        hsw_clip(center=true, rotate=0, type=0, rectbase=height, slop=slop);
     } // carve out the stress-reliever between them to bend
     translate([HSWX_OUTSIDE/2,HSWX_INSIDE/2,height])
       rotate([90,0,0])
@@ -55,32 +56,34 @@ module hsw_clip(
   rotate=0,     // rotate result
   type=0,       // type not used -- may someday specify weak v. strong directional
   hexbase=0,    // put a hexbase on top and give it a height
-  rectbase=0 )  // put a rectangular base on top and give it a height
+  rectbase=0,   // put a rectangular base on top and give it a height
+  slop=0 )        // introduce slop to clip length if too tight
 {
+  hswx_inside = HSWX_INSIDE - slop;
 outline = [ [
 [ -plug_base_lip,                             0 ],
-[              0,                             0, 0.1 ],   // origin
-[              0,               HSWX_LOCK_DEPTH ],   // strong-side base
+[           slop,                             0, 0.1 ],   // origin
+[           slop,               HSWX_LOCK_DEPTH ],   // strong-side base
 [ -HSWX_LOCK_LIP, HSWX_LOCK_LIP+HSWX_LOCK_DEPTH, 0.5 ],   // strong lock
 
 [ -HSWX_LOCK_LIP,                    HSWX_DEPTH, 1.5 ],
 
 [ plug_stud_thickness,               HSWX_DEPTH ],   // spring
 [ plug_spring_base,                  HSWX_DEPTH,   3.5 ],
-[ HSWX_INSIDE/2, HSWX_DEPTH-plug_spring_depth-0.5, 5.0 ], // upper spring midpoint
-[ HSWX_INSIDE-plug_spring_base,      HSWX_DEPTH,   3.5 ],
-[ HSWX_INSIDE-plug_stud_thickness,   HSWX_DEPTH ],
+[ hswx_inside/2, HSWX_DEPTH-plug_spring_depth-0.5, 5.0 ], // upper spring midpoint
+[ hswx_inside-plug_spring_base,      HSWX_DEPTH,   3.5 ],
+[ hswx_inside-plug_stud_thickness,   HSWX_DEPTH ],
 
-[    HSWX_INSIDE,                    HSWX_DEPTH,   2.0 ],    // weak lock
-[ HSWX_INSIDE+HSWX_LOCK_LIP, HSWX_LOCK_DEPTH+HSWX_LOCK_LIP, 0.5 ],
-[    HSWX_INSIDE,               HSWX_LOCK_DEPTH ],   // weak-side base
-[    HSWX_INSIDE,                           0.1,   0.1 ],
-[ HSWX_INSIDE+0.1,                            0 ],
-[ HSWX_INSIDE-plug_stud_thickness-0.5,        0 ],
-[ HSWX_INSIDE-plug_stud_thickness,          0.5,   1.0 ],
+[    hswx_inside,                    HSWX_DEPTH,   2.0 ],    // weak lock
+[ hswx_inside+HSWX_LOCK_LIP, HSWX_LOCK_DEPTH+HSWX_LOCK_LIP, 0.5 ],
+[    hswx_inside,               HSWX_LOCK_DEPTH ],   // weak-side base
+[    hswx_inside,                           0.1,   0.1 ],
+[ hswx_inside+0.1,                            0 ],
+[ hswx_inside-plug_stud_thickness-0.5,        0 ],
+[ hswx_inside-plug_stud_thickness,          0.5,   1.0 ],
 /**/
-[ HSWX_INSIDE-plug_stud_thickness, HSWX_DEPTH-plug_spring_thickness-1.4, 1.5 ],
-[ HSWX_INSIDE-plug_spring_base+.1, HSWX_DEPTH-plug_spring_thickness-0.1, 1.0 ],
+[ hswx_inside-plug_stud_thickness, HSWX_DEPTH-plug_spring_thickness-1.4, 1.5 ],
+[ hswx_inside-plug_spring_base+.1, HSWX_DEPTH-plug_spring_thickness-0.1, 1.0 ],
 
 [ HSWX_INSIDE/2, HSWX_DEPTH-plug_spring_depth-plug_spring_thickness, 6.0 ],
 
@@ -110,7 +113,7 @@ outline = [ [
 // hsw_clip(center=true, rotate=0); //, type=0, hexbase=3);
 if( generate_clipconnector )
   rotate([90,0,0])
-    hsw_clipconnector();
+    hsw_clipconnector( slop=0.05 );
 
 if( generate_clip )
   hsw_clip(center=true, rectbase=generate_clip_rect_base?3:0, hexbase=generate_clip_hex_base?3:0);
